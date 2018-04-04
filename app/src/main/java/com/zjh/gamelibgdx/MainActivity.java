@@ -19,7 +19,7 @@ public class MainActivity extends AndroidApplication {
         setContentView(R.layout.activity_main);
 
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
-        cfg.r = cfg.g = cfg.b = cfg.a = 8;
+        cfg.r = cfg.g = cfg.b = 8;
 
         initialize(new ChangeAppearanceTest() ,cfg);
 

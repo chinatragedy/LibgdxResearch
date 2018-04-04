@@ -6,9 +6,12 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Skeleton;
@@ -91,14 +94,31 @@ public class ChangeAppearanceTest implements ApplicationListener {
 //        Attachment manAttachment = manSkin.getAttachment(index, "torso");
 //        Attachment womanAttachment = womanSkin.getAttachment(index, "torso");
 
-        MeshAttachment manAttachment = (MeshAttachment)manSlot.getAttachment();
-//manAttachment.get
-        Attachment womanAttachment = womanSlot.getAttachment();
-        {
-            womanSlot.setAttachment(manAttachment);
-            //womanSlot.setAttachment(womanAttachment);
-        }
+        MeshAttachment manAttachment = (MeshAttachment) manSlot.getAttachment();
+        MeshAttachment womanAttachment = (MeshAttachment) womanSlot.getAttachment();
 
+
+        float u1 = womanAttachment.getRegion().getU();
+        float v1 = womanAttachment.getRegion().getV();
+        float u2 = womanAttachment.getRegion().getU2();
+        float v2 = womanAttachment.getRegion().getV2();
+
+        int texWidth = (int) (womanAttachment.getRegion().getTexture().getWidth() * (v2 - v1));
+        int texHeight = (int) (womanAttachment.getRegion().getTexture().getHeight() * (u2 - u1));
+
+        Texture tex = new Texture(Gdx.files.internal("goblinMan/body.png"));
+        TextureRegion region = new TextureRegion();//womanAttachment.getRegion();
+
+        region.setRegion(tex);
+        region.setRegion(0f, 0f, 1, 1);
+        region.setRegion(0, 0, texWidth, texHeight);
+
+        womanAttachment.setRegion(region);
+        womanAttachment.updateUVs();
+        {
+            //womanSlot.setAttachment(manAttachment);
+            womanSlot.setAttachment(womanAttachment);
+        }
 
 
         String time = getSystemTime();
@@ -124,7 +144,7 @@ public class ChangeAppearanceTest implements ApplicationListener {
         renderer.draw(batch, womanSkeleton);
         batch.end();
 
-        debugRenderer.draw(womanSkeleton);
+//        debugRenderer.draw(womanSkeleton);
     }
 
     @Override
@@ -164,6 +184,6 @@ public class ChangeAppearanceTest implements ApplicationListener {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return timeMap/1000;
+        return timeMap / 1000;
     }
 }
