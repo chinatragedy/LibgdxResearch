@@ -1,17 +1,13 @@
 package com.zjh.gamelibgdx;
 
-import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceView;
-import android.view.View;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.zjh.gamelibgdx.demo.*;
+import com.zjh.gamelibgdx.demo.SimpleTest1;
 
 public class MainActivity extends AndroidApplication {
 
@@ -25,7 +21,7 @@ public class MainActivity extends AndroidApplication {
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.r = cfg.g = cfg.b = cfg.a = 8;
 
-        initialize(new FirstGame(),cfg);
+        initialize(new MixTest(),cfg);
 
         if (graphics.getView() instanceof SurfaceView) {
             SurfaceView glView = (SurfaceView) graphics.getView();
