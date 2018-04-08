@@ -74,7 +74,7 @@ public class MixTest implements ApplicationListener {
 
         if (true) {
             SkeletonJson json = new SkeletonJson(atlas);
-            json.setScale(2f);
+            json.setScale(1f);
             skeletonData = json.readSkeletonData(Gdx.files.internal(name + "-ess.json"));
         } else {
             SkeletonBinary binary = new SkeletonBinary(atlas);

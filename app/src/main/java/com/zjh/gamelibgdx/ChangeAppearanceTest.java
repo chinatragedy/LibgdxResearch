@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Skeleton;
@@ -21,8 +19,6 @@ import com.esotericsoftware.spine.SkeletonRenderer;
 import com.esotericsoftware.spine.SkeletonRendererDebug;
 import com.esotericsoftware.spine.Skin;
 import com.esotericsoftware.spine.Slot;
-import com.esotericsoftware.spine.SlotData;
-import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
 import java.text.ParseException;
@@ -41,9 +37,9 @@ public class ChangeAppearanceTest implements ApplicationListener {
     PolygonSpriteBatch batch;
 
     SkeletonRenderer renderer;
-    Skeleton manSkeleton, womanSkeleton;
-    AnimationState manState, womanState;
-    Skin manSkin, womanSkin;
+    Skeleton skeleton;
+    AnimationState animationState;
+    Skin skin;
 
     //Debug
     SkeletonRendererDebug debugRenderer;
@@ -61,62 +57,53 @@ public class ChangeAppearanceTest implements ApplicationListener {
 //        debugRenderer.setMeshTriangles(false);
 
         {
-            TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblinWoman/goblins-pma.atlas"));
+            TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("raptor/raptor-pma.atlas"));
             SkeletonJson json = new SkeletonJson(atlas);
-            json.setScale(2f);
-            SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("goblinWoman/goblins-woman-pro.json"));
-            womanSkeleton = new Skeleton(skeletonData);
-            womanSkeleton.setPosition(500, 300);
-            womanSkeleton.setSkin("goblin");
-            womanSkin = womanSkeleton.getSkin();
+            json.setScale(0.5f);
+            SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("raptor/raptor-pro.json"));
+            skeleton = new Skeleton(skeletonData);
+
+            skeleton.setPosition(500, 300);
+            skeleton.setSkin("default");
+            skin = skeleton.getSkin();
 
             AnimationStateData stateData = new AnimationStateData(skeletonData);
+            stateData.setDefaultMix(0.5f);
 
-            womanState = new AnimationState(stateData);
-            womanState.setAnimation(0, "walk", true);
+            animationState = new AnimationState(stateData);
+            animationState.setAnimation(0, "walk", true);
+            animationState.addAnimation(0, "gun-grab", false, 5f);
+            animationState.addAnimation(0, "gun-holster", false, 1f);
+            animationState.addAnimation(0, "roar", false, 1f);
+            animationState.addAnimation(0, "jump", true, 1f);
         }
 
-        {
-            TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblinMan/goblins-pma.atlas"));
-            SkeletonJson json = new SkeletonJson(atlas);
-            json.setScale(2f);
-            SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("goblinMan/goblins-man-pro.json"));
-            manSkeleton = new Skeleton(skeletonData);
-            manSkeleton.setPosition(500, 300);
-            manSkeleton.setSkin("goblin");
-            manSkin = manSkeleton.getSkin();
-        }
+//        {
+//            TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblinMan/goblins-pma.atlas"));
+//            SkeletonJson json = new SkeletonJson(atlas);
+//            json.setScale(2f);
+//            SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("goblinMan/goblins-man-pro.json"));
+//            manSkeleton = new Skeleton(skeletonData);
+//            manSkeleton.setPosition(500, 300);
+//            manSkeleton.setSkin("goblin");
+//            manSkin = manSkeleton.getSkin();
+//        }
 
-        Slot womanSlot = womanSkeleton.findSlot("torso");
-        Slot manSlot = manSkeleton.findSlot("torso");
-
-        int index = manSlot.getData().getIndex();
-//        Attachment manAttachment = manSkin.getAttachment(index, "torso");
-//        Attachment womanAttachment = womanSkin.getAttachment(index, "torso");
-
-        MeshAttachment manAttachment = (MeshAttachment) manSlot.getAttachment();
+        Slot womanSlot = skeleton.findSlot("head");
         MeshAttachment womanAttachment = (MeshAttachment) womanSlot.getAttachment();
 
-
-        float u1 = womanAttachment.getRegion().getU();
-        float v1 = womanAttachment.getRegion().getV();
-        float u2 = womanAttachment.getRegion().getU2();
-        float v2 = womanAttachment.getRegion().getV2();
-
-        int texWidth = (int) (womanAttachment.getRegion().getTexture().getWidth() * (v2 - v1));
-        int texHeight = (int) (womanAttachment.getRegion().getTexture().getHeight() * (u2 - u1));
-
-        Texture tex = new Texture(Gdx.files.internal("goblinMan/body.png"));
+        // 加载图片资源
+        Texture tex = new Texture(Gdx.files.internal("raptor/head.png"));
         TextureRegion region = new TextureRegion();//womanAttachment.getRegion();
 
         region.setRegion(tex);
         region.setRegion(0f, 0f, 1, 1);
-        region.setRegion(0, 0, texWidth, texHeight);
+        region.setRegion(0, 0, tex.getWidth(), tex.getHeight());
 
         womanAttachment.setRegion(region);
+        //更新UV，必须
         womanAttachment.updateUVs();
         {
-            //womanSlot.setAttachment(manAttachment);
             womanSlot.setAttachment(womanAttachment);
         }
 
@@ -126,25 +113,26 @@ public class ChangeAppearanceTest implements ApplicationListener {
         long timeMap = ConvertTime2Timestamp(time);
         Log.d(TAG, "@zjh create: timeMap:" + timeMap);
 
+        Log.d(TAG, "@zjh create: TimeMillis:"+System.currentTimeMillis()/1000);
     }
 
     @Override
     public void render() {
-        womanState.update(Gdx.graphics.getDeltaTime());
+        animationState.update(Gdx.graphics.getDeltaTime());
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (womanState.apply(womanSkeleton)) // Poses manSkeleton using current animations. This sets the bones' local SRT.
-            womanSkeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+        if (animationState.apply(skeleton)) // Poses manSkeleton using current animations. This sets the bones' local SRT.
+            skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
 
         camera.update();
 
         batch.getProjectionMatrix().set(camera.combined);
         batch.begin();
-        renderer.draw(batch, womanSkeleton);
+        renderer.draw(batch, skeleton);
         batch.end();
 
-//        debugRenderer.draw(womanSkeleton);
+//        debugRenderer.draw(skeleton);
     }
 
     @Override
@@ -185,5 +173,13 @@ public class ChangeAppearanceTest implements ApplicationListener {
             e.printStackTrace();
         }
         return timeMap / 1000;
+    }
+
+    public static long getTimestamp() {
+
+        long timeMap = 1522818158;
+        Date date = new Date();
+        date.getTime();
+        return timeMap;
     }
 }
